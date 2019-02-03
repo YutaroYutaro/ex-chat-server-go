@@ -33,6 +33,9 @@ func (room *room) Run() {
 			fmt.Println(client.name, ": join room")
 		case client := <-room.leave:
 			delete(room.clients, client)
+			for c := range room.clients {
+				c.send <- []byte(client.name + " leave")
+			}
 			fmt.Println(client.name, ": leave room")
 		case msg := <-room.msg:
 			for client := range room.clients {
