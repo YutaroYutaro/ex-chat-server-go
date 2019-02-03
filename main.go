@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net"
 	"os"
 )
@@ -13,6 +14,7 @@ func main() {
 	println("Run Server.")
 
 	listener, err := net.Listen("tcp", "localhost:8001")
+	defer listener.Close()
 
 	if err != nil {
 		println("error listening: ", err.Error())
@@ -31,29 +33,25 @@ func main() {
 }
 
 func EchoFunc(conn net.Conn) {
+	defer conn.Close()
 	for {
 		buf := make([]byte, RecvBufLen)
 		n, err := conn.Read(buf)
 
 		if err != nil {
-			println("error reading: ", err.Error())
+			fmt.Println("error reading: ", err.Error())
+			fmt.Println("connect close")
 			return
 		}
 
-		println("received ", n, "bytes of data = ", string(buf))
+		fmt.Println("received ", n, "bytes of data = ", string(buf))
 
 		_, err = conn.Write(buf)
 
 		if err != nil {
-			println("error send reply:", err.Error())
+			fmt.Println("error send reply:", err.Error())
 		} else {
-			println("Reply sent")
-		}
-
-		if string(buf) == "exit" {
-			conn.Close()
-			println("Connect close")
-			break
+			fmt.Println("reply sent")
 		}
 	}
 }
