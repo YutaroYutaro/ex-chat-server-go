@@ -43,17 +43,15 @@ func (client *client) ReceiveMessage() {
 
 func (client *client) SendMessage() {
 	for {
-		select {
-		case msg := <-client.send:
-			_, err := client.conn.Write(msg)
+		msg := <-client.send
+		_, err := client.conn.Write(msg)
 
-			if err != nil {
-				fmt.Println("error send reply:", err.Error())
-				client.room.leave <- client
-				return
-			} else {
-				fmt.Println("reply sent")
-			}
+		if err != nil {
+			fmt.Println("error send reply:", err.Error())
+			client.room.leave <- client
+			return
+		} else {
+			fmt.Println("reply sent")
 		}
 
 	}
