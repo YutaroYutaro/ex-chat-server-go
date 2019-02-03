@@ -27,6 +27,9 @@ func (room *room) Run() {
 		select {
 		case client := <-room.join:
 			room.clients[client] = true
+			for c := range room.clients {
+				c.send <- []byte(client.name + " join")
+			}
 			fmt.Println(client.name, ": join room")
 		case client := <-room.leave:
 			delete(room.clients, client)
