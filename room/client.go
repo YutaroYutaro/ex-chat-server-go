@@ -11,13 +11,15 @@ const (
 
 type client struct {
 	conn net.Conn
+	name string
 	send chan []byte
 	room *room
 }
 
-func NewClient(conn net.Conn, room *room) *client {
+func NewClient(conn net.Conn, room *room, name string) *client {
 	return &client{
 		conn: conn,
+		name: name,
 		send: make(chan []byte),
 		room: room,
 	}

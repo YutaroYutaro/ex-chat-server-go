@@ -27,10 +27,10 @@ func (room *room) Run() {
 		select {
 		case client := <-room.join:
 			room.clients[client] = true
-			fmt.Println("join room")
+			fmt.Println(client.name, ": join room")
 		case client := <-room.leave:
 			delete(room.clients, client)
-			fmt.Println("leave room")
+			fmt.Println(client.name, ": leave room")
 		case msg := <-room.msg:
 			for client := range room.clients {
 				client.send <- msg
@@ -50,12 +50,21 @@ func (room *room) AcceptClient() {
 
 	for {
 		conn, err := listener.Accept()
+
 		if err != nil {
 			println("error accept: ", err.Error())
 			return
 		}
 
-		client := NewClient(conn, room)
+		name := make([]byte, 64)
+		_, err = conn.Read(name)
+
+		if err != nil {
+			fmt.Println("error reading name: ", err.Error())
+			return
+		}
+
+		client := NewClient(conn, room, string(name))
 
 		room.join <- client
 
